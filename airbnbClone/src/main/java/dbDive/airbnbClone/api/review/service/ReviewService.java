@@ -1,6 +1,7 @@
 package dbDive.airbnbClone.api.review.service;
 
 import dbDive.airbnbClone.api.review.dto.request.ReviewRequest;
+import dbDive.airbnbClone.api.review.dto.response.ReviewModifyResponse;
 import dbDive.airbnbClone.api.review.dto.response.ReviewResponse;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
@@ -38,5 +39,24 @@ public class ReviewService {
                 .comment(request.getComment())
                 .build();
         reviewRepository.save(review);
+    }
+    @Transactional
+    public ReviewModifyResponse modify(Long reviewId, Long userId, ReviewRequest request) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new GlobalException("존재하지 않는 리뷰입니다."));
+        if(review.getUser().getId() != userId){
+            throw new GlobalException("잘못된 접근입니다.");
+        }
+
+        review.update(request.getComment());
+
+        return new ReviewModifyResponse(request.getComment());
+    }
+
+    public void delete(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new GlobalException("존재하지 않는 리뷰입니다."));
+        if(review.getUser().getId() != userId){
+            throw new GlobalException("잘못된 접근입니다.");
+        }
+        reviewRepository.deleteById(reviewId);
     }
 }

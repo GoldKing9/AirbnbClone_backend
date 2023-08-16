@@ -1,6 +1,7 @@
 package dbDive.airbnbClone.api.review.controller;
 
 import dbDive.airbnbClone.api.review.dto.request.ReviewRequest;
+import dbDive.airbnbClone.api.review.dto.response.ReviewModifyResponse;
 import dbDive.airbnbClone.api.review.dto.response.ReviewResponse;
 import dbDive.airbnbClone.api.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,21 @@ public class ReviewController {
         return reviewService.getReviews(accommodationId, pageable);
     }
 
-    @PostMapping("/api/auth/user/accommodation/{accommodationId}/review/{userId}")
+    @PostMapping("/api/auth/user/accommodation/review/{accommodationId}/{userId}")
     public void postReview(@PathVariable Long accommodationId, @PathVariable Long userId, @RequestBody ReviewRequest request){
         // TODO : LOGIN기능 개발 후 수정
         reviewService.post(accommodationId, userId, request);
+    }
+
+    @PutMapping("/api/auth/user/accommodation/review/{reviewId}/{userId}")
+    public ReviewModifyResponse modify(@PathVariable Long reviewId, @PathVariable Long userId, @RequestBody ReviewRequest request){
+        // TODO : LOGIN기능 개발 후 수정
+        return reviewService.modify(reviewId, userId, request);
+    }
+
+    @DeleteMapping("/api/auth/user/accommodation/review/{reviewId}/{userId}")
+    public void delete(@PathVariable Long reviewId, @PathVariable Long userId){
+        // TODO : LOGIN기능 개발 후 수정
+        reviewService.delete(reviewId, userId);
     }
 }
