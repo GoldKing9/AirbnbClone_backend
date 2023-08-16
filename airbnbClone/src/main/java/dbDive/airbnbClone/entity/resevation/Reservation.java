@@ -23,7 +23,7 @@ public class Reservation extends BaseTimeEntity {
     private Long id;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private boolean isDeleted;
+    private boolean isDeleted = false;
     private int totalPrice;
     private int guest;
 
@@ -32,7 +32,7 @@ public class Reservation extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accommodation_id")
+    @JoinColumn(name = "acmd_id")
     private Accommodation accommodation;
 
 }

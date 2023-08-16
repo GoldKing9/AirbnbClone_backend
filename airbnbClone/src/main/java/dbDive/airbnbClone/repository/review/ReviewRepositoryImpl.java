@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import static dbDive.airbnbClone.entity.review.QReview.*;
+import static dbDive.airbnbClone.entity.review.QReview.review;
 import static dbDive.airbnbClone.entity.user.QUser.user;
 
 @RequiredArgsConstructor

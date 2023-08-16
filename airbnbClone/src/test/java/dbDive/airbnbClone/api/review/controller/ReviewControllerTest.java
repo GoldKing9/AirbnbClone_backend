@@ -1,5 +1,7 @@
 package dbDive.airbnbClone.api.review.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dbDive.airbnbClone.api.review.dto.request.ReviewRequest;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.review.Review;
 import dbDive.airbnbClone.entity.user.User;
@@ -10,11 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,20 +30,24 @@ class ReviewControllerTest {
     @Autowired AccommodationRepository acmdRepository;
     @Autowired UserRepository userRepository;
     @Autowired ReviewRepository reviewRepository;
+    @Autowired ObjectMapper objectMapper;
 
     @Test
     void 리뷰_조회() throws Exception {
-        User user = new User();
-        userRepository.save(user);
-        Accommodation acmd = new Accommodation();
-        acmdRepository.save(acmd);
-        Review review = Review.builder().comment("짱이네요").user(user).accommodation(acmd).build();
-        Review review2 = Review.builder().comment("최고예요").user(user).accommodation(acmd).build();
-        reviewRepository.save(review);
-        reviewRepository.save(review2);
+        mockMvc.perform(get("/api/reviews/2?page=1"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 
+    @Test
+    void 리뷰_등록() throws Exception {
+        ReviewRequest request = new ReviewRequest("하록 최고", 5);
+        String json = objectMapper.writeValueAsString(request);
 
-        mockMvc.perform(get("/api/reviews/1?page=2&size=1"))
+        mockMvc.perform(post("/api/auth/user/accommodation/1/review/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
                 .andExpect(status().isOk())
                 .andDo(print());
     }
