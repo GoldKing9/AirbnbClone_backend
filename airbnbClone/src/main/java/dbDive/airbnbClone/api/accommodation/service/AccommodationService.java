@@ -2,6 +2,7 @@ package dbDive.airbnbClone.api.accommodation.service;
 
 import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
+import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
 import dbDive.airbnbClone.repository.accommodation.AccommodationRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +18,9 @@ public class AccommodationService {
     public SearchResponse search(Pageable pageable, SearchRequest request) {
         PageImpl<AccommodationDataDto> accommodations = accommodationRepository.search(pageable,request);
         return new SearchResponse(accommodations);
+    }
+
+    public DetailAcmdResponse detail(Long accommodationId) {
+        return accommodationRepository.findAccommodation(accommodationId);
     }
 }

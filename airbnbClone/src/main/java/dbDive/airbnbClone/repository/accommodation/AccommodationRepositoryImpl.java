@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
 import dbDive.airbnbClone.api.accommodation.dto.ImageDto;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
+import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,37 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @RequiredArgsConstructor
 public class AccommodationRepositoryImpl implements AccommodationRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
+
+    @Override
+    public DetailAcmdResponse findAccommodation(Long accommodationId) {
+        DetailAcmdResponse detailAcmdResponse = jpaQueryFactory.select(Projections.constructor(DetailAcmdResponse.class,
+                        accommodation.mainAddress,
+                        accommodation.detailAddress,
+                        accommodation.price,
+                        accommodation.user.id,
+                        accommodation.user.username,
+                        accommodation.user.userDescription,
+                        accommodation.guest,
+                        accommodation.bed,
+                        accommodation.bedroom,
+                        accommodation.bathroom,
+                        review.rating.avg(),
+                        review.count()
+                ))
+                .from(accommodation)
+                .leftJoin(review).on(accommodation.eq(review.accommodation))
+                .where(accommodation.id.eq(accommodationId))
+                .fetchOne();
+        List<ImageDto> images = jpaQueryFactory.select(Projections.constructor(ImageDto.class,
+                        acmdImage.imageUrl
+                ))
+                .from(accommodation)
+                .leftJoin(acmdImage).on(accommodation.eq(acmdImage.accommodation))
+                .where(accommodation.id.eq(accommodationId))
+                .fetch();
+        detailAcmdResponse.setImages(images);
+        return detailAcmdResponse;
+    }
 
     @Override
     public PageImpl<AccommodationDataDto> search(Pageable pageable, SearchRequest request) {
