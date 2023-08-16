@@ -43,7 +43,7 @@ class ReviewControllerTest {
         ReviewRequest request = new ReviewRequest("하록 최고", 5);
         String json = objectMapper.writeValueAsString(request);
 
-        mockMvc.perform(post("/api/auth/user/accommodation/1/review/1")
+        mockMvc.perform(post("/api/auth/user/accommodation/review/1/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )

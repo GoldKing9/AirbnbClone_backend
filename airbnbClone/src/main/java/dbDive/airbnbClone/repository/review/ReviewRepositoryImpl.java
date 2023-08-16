@@ -11,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
+import static com.querydsl.core.types.ExpressionUtils.count;
+import static dbDive.airbnbClone.entity.accommodation.QAccommodation.accommodation;
 import static dbDive.airbnbClone.entity.review.QReview.review;
 import static dbDive.airbnbClone.entity.user.QUser.user;
 
@@ -26,7 +30,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 ConstantImpl.create("%Y년 %m월")
         );
 
-        QueryResults<ReviewComment> result = queryFactory
+        List<ReviewComment> result = queryFactory
                 .select(Projections.constructor(
                         ReviewComment.class,
                         user.id,
@@ -36,11 +40,18 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 )
                 .from(review)
                 .join(review.user, user)
-                .where(review.accommodation.id.eq(acmdId))
+                .join(review.accommodation, accommodation)
+                .where(accommodation.id.eq(acmdId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetchResults();
+                .fetch();
 
-        return new PageImpl<ReviewComment>(result.getResults(), pageable, result.getTotal());
+        Long total = queryFactory
+                .select(review.count())
+                .from(review)
+                .where(review.accommodation.id.eq(acmdId))
+                .fetchOne();
+
+        return new PageImpl<ReviewComment>(result, pageable, total);
     }
 }

@@ -1,5 +1,6 @@
 package dbDive.airbnbClone;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,7 +19,7 @@ public class AirbnbCloneApplication {
 
 	@Bean
 	public JPAQueryFactory jpaQueryFactory() {
-		return new JPAQueryFactory(em);
+		return new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
 	}
 
 	public static void main(String[] args) {
