@@ -2,6 +2,7 @@ package dbDive.airbnbClone.api.user.service;
 
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
 import dbDive.airbnbClone.api.user.dto.request.SignupReq;
+import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
@@ -53,5 +54,9 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("존재하지 않는 회원입니다."));
         user.update(request.getUserDescription());
+    }
+
+    public UserProfileResponse getUserProfile(Long userId) {
+        return userRepository.getUserProfile(userId);
     }
 }

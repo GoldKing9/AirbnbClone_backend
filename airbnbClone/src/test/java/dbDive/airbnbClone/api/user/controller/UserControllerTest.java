@@ -41,4 +41,11 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    void 회원_조회() throws Exception {
+        mockMvc.perform(get("/api/user/4"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }

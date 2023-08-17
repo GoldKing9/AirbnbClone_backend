@@ -2,6 +2,7 @@ package dbDive.airbnbClone.api.user.controller;
 
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
 import dbDive.airbnbClone.api.user.dto.request.SignupReq;
+import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,10 @@ public class UserController {
     @PutMapping("/api/auth/user/{userId}")
     public void modifyUserProfile(@PathVariable Long userId, @RequestBody ModifyUserProfileRequest request){
         userService.modifyUserProfile(userId, request);
+    }
+
+    @GetMapping("/api/user/{userId}")
+    public UserProfileResponse userProfile(@PathVariable Long userId){
+        return userService.getUserProfile(userId);
     }
 }
