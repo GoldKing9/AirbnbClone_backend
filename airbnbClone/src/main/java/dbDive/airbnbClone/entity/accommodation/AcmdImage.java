@@ -1,12 +1,13 @@
 package dbDive.airbnbClone.entity.accommodation;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AcmdImage {
 
     @Id

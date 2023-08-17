@@ -3,7 +3,7 @@ package dbDive.airbnbClone.entity.accommodation;
 import dbDive.airbnbClone.entity.BaseTimeEntity;
 import dbDive.airbnbClone.entity.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.Constraint;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE Accommodation SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class Accommodation extends BaseTimeEntity {
@@ -44,7 +44,7 @@ public class Accommodation extends BaseTimeEntity {
         this.acmdName = acmdName;
         this.acmdDescription = acmdDescription;
         this.price = price;
-        this.isDeleted = false;
+        this.isDeleted = isDeleted;
         this.user = user;
     }
 }

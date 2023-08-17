@@ -37,14 +37,9 @@ out/
 .vscode/
 *.yml
 *.properties
+
+src/main/generated/
 *.DS_STORE
 **/.DS_STORE
-/src/main/generated/
 .DS_Store
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/accommodation/QAccommodation.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/user/QUser.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/review/QReview.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/resevation/QReservation.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/QBaseTimeEntity.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/accommodation/QAcmdImage.java
-airbnbClone/src/main/generated/dbDive/airbnbClone/entity/accommodation/QAccommodation.java
+
