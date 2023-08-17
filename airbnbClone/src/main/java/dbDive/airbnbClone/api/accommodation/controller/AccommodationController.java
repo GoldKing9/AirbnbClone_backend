@@ -1,15 +1,16 @@
 package dbDive.airbnbClone.api.accommodation.controller;
 
+import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
 import dbDive.airbnbClone.api.accommodation.service.AccommodationService;
+import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,11 @@ public class AccommodationController {
     @GetMapping("/api/accommodation/{accommodationId}")
     public DetailAcmdResponse detail(@PathVariable Long accommodationId) {
         return accommodationService.detail(accommodationId);
+    }
+    @PostMapping("/accommodation")
+    public ResponseEntity<Accommodation> registerAccommodation(@RequestBody AccommodationDataDto dto) {
+        Accommodation savedAccommodation = accommodationService.saveAccommodation(dto);
+        return new ResponseEntity<>(savedAccommodation, HttpStatus.CREATED);
     }
 
 }
