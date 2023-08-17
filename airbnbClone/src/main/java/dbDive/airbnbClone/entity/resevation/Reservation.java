@@ -32,7 +32,7 @@ public class Reservation extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accommodation_id")
+    @JoinColumn(name = "acmd_id")
     private Accommodation accommodation;
 
 }

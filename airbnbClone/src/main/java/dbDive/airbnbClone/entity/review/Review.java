@@ -4,6 +4,7 @@ import dbDive.airbnbClone.entity.BaseTimeEntity;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.user.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -30,4 +31,17 @@ public class Review extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acmd_id")
     private Accommodation accommodation;
+
+    @Builder
+    public Review(int rating, String comment, User user, Accommodation accommodation) {
+        this.rating = rating;
+        this.isDeleted = false;
+        this.comment = comment;
+        this.user = user;
+        this.accommodation = accommodation;
+    }
+
+    public void update(String comment){
+        this.comment = comment;
+    }
 }
