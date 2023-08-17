@@ -1,5 +1,11 @@
 package dbDive.airbnbClone.api.user.controller;
 
+import dbDive.airbnbClone.api.user.dto.request.SignupReq;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
 import dbDive.airbnbClone.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/api/user/{userId}/review")
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody SignupReq signupReq) {
+        userService.signup(signupReq);
+
+        return ResponseEntity.ok().body("회원가입 성공");
+    }
+
+    @GetMapping("/{userId}/review")
     public UserReviewResponse userReview(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "1") int page,
