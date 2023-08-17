@@ -23,7 +23,7 @@ public class Reservation extends BaseTimeEntity {
     private Long id;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private boolean isDeleted = false;
+    private boolean isDeleted;
     private int totalPrice;
     private int guest;
 

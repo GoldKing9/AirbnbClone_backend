@@ -21,7 +21,7 @@ public class Review extends BaseTimeEntity {
     private Long id;
 
     private int rating;
-    private boolean isDeleted = false;
+    private boolean isDeleted;
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageImpl;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 public class ReviewResponse {
     private List<ReviewComment> result;
     private int totalPages;

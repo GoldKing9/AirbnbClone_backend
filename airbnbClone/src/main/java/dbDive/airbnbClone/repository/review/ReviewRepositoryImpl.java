@@ -40,8 +40,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 )
                 .from(review)
                 .join(review.user, user)
-                .join(review.accommodation, accommodation)
-                .where(accommodation.id.eq(acmdId))
+                .where(review.accommodation.id.eq(acmdId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

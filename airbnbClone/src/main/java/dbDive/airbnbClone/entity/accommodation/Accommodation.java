@@ -28,7 +28,7 @@ public class Accommodation extends BaseTimeEntity {
     private String acmdName;
     private String acmdDescription;
     private int price;
-    private boolean isDeleted = false;
+    private boolean isDeleted;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
