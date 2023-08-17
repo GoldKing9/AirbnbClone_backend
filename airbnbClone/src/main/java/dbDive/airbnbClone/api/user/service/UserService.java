@@ -4,10 +4,14 @@ import dbDive.airbnbClone.api.user.dto.request.SignupReq;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
-import dbDive.airbnbClone.repository.user.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
+import dbDive.airbnbClone.api.user.dto.response.UserReviews;
+import dbDive.airbnbClone.repository.user.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+  
     public void signup(SignupReq signupReq) {
 
         userRepository.findByEmail(signupReq.getEmail()).ifPresent(user -> {
@@ -31,6 +36,12 @@ public class UserService {
                 .build();
 
         userRepository.save(newUser);
+    }
 
+
+    public UserReviewResponse getUserReviews(Long userId, Pageable pageable) {
+        PageImpl<UserReviews> allByUserId = userRepository.findAllByUserId(userId, pageable);
+
+        return new UserReviewResponse(allByUserId);
     }
 }
