@@ -1,5 +1,6 @@
 package dbDive.airbnbClone.api.user.service;
 
+import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
 import dbDive.airbnbClone.api.user.dto.request.SignupReq;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.entity.user.User;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +45,13 @@ public class UserService {
         PageImpl<UserReviews> allByUserId = userRepository.findAllByUserId(userId, pageable);
 
         return new UserReviewResponse(allByUserId);
+    }
+
+    @Transactional
+    public void modifyUserProfile(Long userId, ModifyUserProfileRequest request) {
+        // TODO : 로그인 유저 ID와 userID 같은지 검증
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("존재하지 않는 회원입니다."));
+        user.update(request.getUserDescription());
     }
 }
