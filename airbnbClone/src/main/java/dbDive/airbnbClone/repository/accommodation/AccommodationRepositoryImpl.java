@@ -88,9 +88,19 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
         fillAccommodationImages(accommodations);
 
         Long count = jpaQueryFactory.select(
-                        accommodation.count()
+                        accommodation.countDistinct()
                 )
                 .from(accommodation)
+                .leftJoin(review).on(accommodation.eq(review.accommodation))
+                .where(
+                        containMainAddress(request.mainAddress()),
+                        periodDate(request.checkIn(), request.checkout()),
+                        betweenPrice(request.minPrice(), request.maxPrice()),
+                        goeGuest(request.guest()),
+                        goeBathroom(request.bathroom()),
+                        goeBedroom(request.bedroom()),
+                        goeBed(request.bed())
+                )
                 .fetchOne();
 
         return new PageImpl<>(accommodations, pageable, count);
@@ -99,7 +109,7 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
     private void fillAccommodationImages(List<AccommodationDataDto> accommodations) {
         List<Long> acmdId = accommodations.stream()
                 .map(AccommodationDataDto::getAccommodationId)
-                .collect(Collectors.toList());
+                .toList();
 
         Map<Long, List<ImageDto>> imageMap = jpaQueryFactory.select(
                         accommodation.id,

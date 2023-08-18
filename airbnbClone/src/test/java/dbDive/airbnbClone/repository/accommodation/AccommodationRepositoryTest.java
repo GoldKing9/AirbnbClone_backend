@@ -81,11 +81,12 @@ class AccommodationRepositoryTest {
     @Test
     void test() {
         Pageable pageable = PageRequest.of(0, 100);
-        SearchRequest request = new SearchRequest(null, LocalDate.of(2023, 6, 3), LocalDate.of(2023, 6, 23), 0, Integer.MAX_VALUE, 1, 1, 1, 1);
+        SearchRequest request = new SearchRequest(null, LocalDate.of(2022, 8, 23), LocalDate.of(2022, 9, 3), 0, Integer.MAX_VALUE, 1, 1, 1, 1);
         PageImpl<AccommodationDataDto> search = accommodationRepository.search(pageable, request);
         for (AccommodationDataDto accommodationDataDto : search) {
             System.out.println("accommodationDataDto = " + accommodationDataDto);
         }
+        System.out.println(search.getContent().size());
         System.out.println(search.getTotalPages());
         System.out.println(search.getNumber());
 
