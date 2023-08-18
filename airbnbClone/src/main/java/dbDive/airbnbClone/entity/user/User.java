@@ -62,4 +62,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void update(String description){
+        this.userDescription = description;
+    }
 }

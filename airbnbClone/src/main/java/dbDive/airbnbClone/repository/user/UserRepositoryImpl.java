@@ -7,6 +7,9 @@ import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dbDive.airbnbClone.api.review.dto.response.ReviewComment;
+import dbDive.airbnbClone.api.user.dto.response.UserProfileAcmd;
+import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.api.user.dto.response.UserReviews;
 import dbDive.airbnbClone.entity.accommodation.AcmdImage;
 import dbDive.airbnbClone.entity.accommodation.QAccommodation;
@@ -77,5 +80,89 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .fetchOne();
 
         return new PageImpl<UserReviews>(result, pageable, total);
+    }
+
+    @Override
+    public UserProfileResponse getUserProfile(Long userId) {
+        JPQLQuery<Double> average = JPAExpressions
+                .select(review.rating.avg())
+                .from(review)
+                .where(accommodation.user.id.eq(userId),
+                        review.accommodation.eq(accommodation));
+
+        JPQLQuery<Long> commentCnt = JPAExpressions
+                .select(review.count())
+                .from(review)
+                .where(accommodation.user.id.eq(userId), review.accommodation.eq(accommodation));
+
+        UserProfileResponse response = queryFactory
+                .select(Projections.constructor(
+                        UserProfileResponse.class,
+                        user.username,
+                        commentCnt,
+                        average,
+                        user.userDescription
+                ))
+                .from(user)
+                .where(user.id.eq(userId))
+                .fetchOne();
+
+
+        StringTemplate formattedDate = Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})",
+                review.createdAt,
+                ConstantImpl.create("%Y년 %m월")
+        );
+
+        QUser reviewUser = new QUser("reviewUser");
+
+        List<ReviewComment> reviews = queryFactory
+                .select(Projections.constructor(
+                        ReviewComment.class,
+                        reviewUser.id,
+                        reviewUser.username,
+                        formattedDate,
+                        review.comment
+                ))
+                .from(review)
+                .join(review.user, reviewUser)
+                .where(review.accommodation.eq(accommodation)
+                        .and(accommodation.user.id.eq(userId)))
+                .limit(6)
+                .fetch();
+        
+        response.setReviews(reviews);
+
+        JPQLQuery<String> url = JPAExpressions
+                .select(acmdImage.imageUrl)
+                .from(acmdImage)
+                .where(acmdImage.id.eq(
+                        JPAExpressions
+                                .select(acmdImage.id.min())
+                                .from(acmdImage)
+                                .where(acmdImage.accommodation.eq(accommodation))
+                ));
+
+        JPQLQuery<Double> acmdAvg = JPAExpressions
+                .select(review.rating.avg())
+                .from(review)
+                .where(review.accommodation.eq(accommodation));
+
+        List<UserProfileAcmd> accommodations = queryFactory
+                .select(Projections.constructor(
+                        UserProfileAcmd.class,
+                        accommodation.id,
+                        url,
+                        acmdAvg,
+                        accommodation.mainAddress
+                ))
+                .from(accommodation)
+                .where(accommodation.user.id.eq(userId))
+                .limit(10)
+                .fetch();
+
+        response.setAccommodations(accommodations);
+
+        return response;
     }
 }
