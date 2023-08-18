@@ -28,6 +28,7 @@ public class AccommodationService {
     }
 
     public Accommodation saveAccommodation(AccommodationDataDto dto) {
+        // 빌더패턴, 정적 팩토리 메서드
         Accommodation accommodation = new Accommodation(dto.getMainAddress(),  dto.getPrice(), dto.getDetailAddress(), dto.getAcmdName(), dto.getAcmdDescription(), dto.getGuest(), dto.getBedroom(), dto.getBed(), dto.getBathroom());
 
         for (ImageDto imageDto : dto.getImages()) {
@@ -35,7 +36,6 @@ public class AccommodationService {
             image.setAccommodation(accommodation);
             accommodation.getImages().add(image);
         }
-
         return accommodationRepository.save(accommodation);
     }
 }
