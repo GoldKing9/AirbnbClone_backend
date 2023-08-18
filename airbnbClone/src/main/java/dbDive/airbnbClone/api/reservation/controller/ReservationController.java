@@ -22,8 +22,8 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping(value = "/{accommodationId}/book") //숙소 예약 -> 프론트에서  checkIn/checkOut/totalPrice/guest 받아서 예약 진행
-    public String book(@PathVariable Long accommodationId, @RequestBody BookRequest request) {
-        return reservationService.bookAccommodation(accommodationId, request);
+    public void book(@PathVariable Long accommodationId, @RequestBody BookRequest request) {
+        reservationService.bookAccommodation(accommodationId, request);
     }
 
     @GetMapping(value = "/user/reservations") // 게스트 - 숙소 예약 전체 조회

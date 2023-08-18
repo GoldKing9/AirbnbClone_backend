@@ -26,7 +26,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public String bookAccommodation(Long accommodationId, BookRequest request) {
+    public void bookAccommodation(Long accommodationId, BookRequest request) {
 
         //숙소 예약 -> 프론트에서  checkIn/checkOut/totalPrice/guest 받아서 예약 진행
         Accommodation findAcmd = accommodationRepository.findById(accommodationId).orElseThrow(() -> new GlobalException("존재하지 않는 숙소입니다,"));
@@ -38,7 +38,6 @@ public class ReservationService {
                 .accommodation(findAcmd)
                 .build();
         reservationRepository.save(reservation);
-        return "redirect:/api/auth/user/reservations/" + accommodationId;
     }
 
     public TotalAccommodationResponse allAccommodations(Pageable pageable) {
