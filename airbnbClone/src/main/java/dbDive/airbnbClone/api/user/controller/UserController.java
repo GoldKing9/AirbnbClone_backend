@@ -1,17 +1,19 @@
 package dbDive.airbnbClone.api.user.controller;
 
+import dbDive.airbnbClone.api.user.dto.request.LoginReq;
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
 import dbDive.airbnbClone.api.user.dto.request.SignupReq;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import dbDive.airbnbClone.config.auth.AuthUser;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
 import dbDive.airbnbClone.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,10 +22,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/api/user/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupReq signupReq) {
+    public void signup(@Validated @RequestBody SignupReq signupReq) {
         userService.signup(signupReq);
+    }
 
-        return ResponseEntity.ok().body("회원가입 성공");
+    @PostMapping("/api/user/login")
+    public void login(@Validated @RequestBody LoginReq loginReq, HttpServletResponse response) {
+
+        response.setHeader("Authorization", userService.login(loginReq));
+    }
+
+    @PostMapping("/api/auth/user/logout")
+    public void logout(@AuthenticationPrincipal AuthUser authUser) {
+        
     }
 
     @GetMapping("/api/user/{userId}/review")

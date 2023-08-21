@@ -1,12 +1,19 @@
 package dbDive.airbnbClone.api.user.service;
 
+import dbDive.airbnbClone.api.user.dto.request.LoginReq;
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
 import dbDive.airbnbClone.api.user.dto.request.SignupReq;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.common.GlobalException;
+import dbDive.airbnbClone.config.auth.AuthUser;
+import dbDive.airbnbClone.config.utils.JwtProperties;
+import dbDive.airbnbClone.config.utils.JwtUtils;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
 import dbDive.airbnbClone.api.user.dto.response.UserReviews;
@@ -23,24 +30,41 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-  
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+
     public void signup(SignupReq signupReq) {
 
-        userRepository.findByEmail(signupReq.getEmail()).ifPresent(user -> {
-            throw new GlobalException("이미 존재하는 유저");
-        });
+        userRepository.findByEmail(signupReq.getEmail())
+                .ifPresent(user -> {throw new GlobalException("중복된 유저가 존재합니다.");});
 
         User newUser = User.builder()
-                .username(signupReq.getUsername())
                 .email(signupReq.getEmail())
                 .password(passwordEncoder.encode(signupReq.getPassword()))
-                .birth(signupReq.getBirth())
                 .role(UserRole.USER)
+                .username(signupReq.getUsername())
+                .birth(signupReq.getBirth())
+                .userDescription("")
                 .build();
 
         userRepository.save(newUser);
+
     }
 
+    public String login(LoginReq loginReq) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        AuthUser authUser = (AuthUser) authentication.getPrincipal();
+
+        String jwt = JwtProperties.TOKEN_PREFIX + jwtUtils.generateJwt(authUser);
+
+        return jwt;
+
+    }
 
     public UserReviewResponse getUserReviews(Long userId, Pageable pageable) {
         PageImpl<UserReviews> allByUserId = userRepository.findAllByUserId(userId, pageable);
