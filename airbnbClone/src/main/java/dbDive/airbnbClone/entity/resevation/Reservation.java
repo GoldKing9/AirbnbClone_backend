@@ -4,6 +4,7 @@ import dbDive.airbnbClone.entity.BaseTimeEntity;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.user.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE Reservation SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+//@Where(clause = "is_deleted = false")
 public class Reservation extends BaseTimeEntity {
 
     @Id
