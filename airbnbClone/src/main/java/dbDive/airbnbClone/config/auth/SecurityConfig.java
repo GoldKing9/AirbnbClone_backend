@@ -1,5 +1,6 @@
 package dbDive.airbnbClone.config.auth;
 
+import dbDive.airbnbClone.config.filter.CustomAuthenticationEntryPoint;
 import dbDive.airbnbClone.config.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final AuthService authService;
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -29,6 +31,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider())
+                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint).and()
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/api/auth/**").authenticated()
                         .anyRequest().permitAll())
@@ -40,7 +43,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(authService);

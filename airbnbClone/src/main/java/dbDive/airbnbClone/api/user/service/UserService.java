@@ -6,6 +6,7 @@ import dbDive.airbnbClone.api.user.dto.request.SignupReq;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.config.auth.AuthUser;
+import dbDive.airbnbClone.config.utils.JwtProperties;
 import dbDive.airbnbClone.config.utils.JwtUtils;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
@@ -30,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
     public void signup(SignupReq signupReq) {
 
@@ -58,7 +60,9 @@ public class UserService {
 
         AuthUser authUser = (AuthUser) authentication.getPrincipal();
 
-        return JwtUtils.generateJwt(authUser);
+        String jwt = JwtProperties.TOKEN_PREFIX + jwtUtils.generateJwt(authUser);
+
+        return jwt;
 
     }
 

@@ -1,8 +1,7 @@
 package dbDive.airbnbClone.config.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.config.auth.AuthUser;
+import dbDive.airbnbClone.config.filter.CustomAuthenticationEntryPoint;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
 import io.jsonwebtoken.*;
@@ -10,8 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -20,13 +18,14 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtUtils {
-    private static Key key;
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    public static String generateJwt(AuthUser authUser) {
-        byte[] keyBytes = Decoders.BASE64.decode(JwtProperties.secretKey);
-        key = Keys.hmacShaKeyFor(keyBytes);
+     private final Key key;
+    public JwtUtils(@Value("${jwt.secretKey}") String secretKey) {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String generateJwt(AuthUser authUser) {
 
         return Jwts.builder()
                 .claim("id", authUser.getUser().getId())
@@ -53,20 +52,15 @@ public class JwtUtils {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token); //토큰에 대한 검증 로직
             return true;
         } catch (ExpiredJwtException e) {
-            setResponse(response, e, "토큰시간이 만료되었습니다.");
+            CustomAuthenticationEntryPoint.setResponse(response, "토큰시간이 만료되었습니다.");
         } catch (MalformedJwtException e) {
-            setResponse(response, e, "JWT 토큰이 유효하지 않습니다.");
+            CustomAuthenticationEntryPoint.setResponse(response, "JWT 토큰이 유효하지 않습니다.");
         } catch (UnsupportedJwtException e) {
-            setResponse(response, e, "지원하지 않는 토큰입니다.");
+            CustomAuthenticationEntryPoint.setResponse(response, "지원하지 않는 토큰입니다.");
         }
-        return false;
-    }
+        // todo 토큰없을때
 
-    private void setResponse(HttpServletResponse response, Exception e, String errorMessage) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write(objectMapper.writeValueAsString(new GlobalException(errorMessage)));
+        return false;
     }
 
     public AuthUser getAuthUser(String jwt) {

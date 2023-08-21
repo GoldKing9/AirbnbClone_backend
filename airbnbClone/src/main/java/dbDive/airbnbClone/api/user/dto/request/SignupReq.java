@@ -12,7 +12,7 @@ public class SignupReq {
     private String username;
     @Email
     private String email;
-    @Pattern(regexp = "[a-z0-9]{4,14}")
+    @Pattern(regexp = "^[a-z0-9]{4,14}$")
     private String password;
     private LocalDate birth;
 }
