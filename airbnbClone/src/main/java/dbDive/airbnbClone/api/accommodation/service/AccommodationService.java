@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +85,6 @@ public class AccommodationService {
         for (AcmdImage newImage : uploadImage) {
             accommodation.addImage(newImage);
         }
-
 //        if (dto.getDeleteImageKey() != null && !dto.getDeleteImageKey().isEmpty()) {
 //            for (String deleteKey : dto.getDeleteImageKey()) {
 //                AcmdImage imageToDelete = accommodation.getImages().stream()
@@ -99,16 +99,21 @@ public class AccommodationService {
 //            }
 //        }
 
-
         return accommodationRepository.save(accommodation);
     }
+    public boolean deleteAccommodation(Long accommodationId) {
+        Optional<Accommodation> accommodationOpt = accommodationRepository.findById(accommodationId);
 
+        if (accommodationOpt.isEmpty()) {
+            return false;
+        }
+        Accommodation accommodation = accommodationOpt.get();
 
-    public void deleteAccommodation(Long accommodationId) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).
-                orElseThrow(() -> new EntityNotFoundException("해당하는 숙소가 없습니다 Id : " + accommodationId));
+        for (AcmdImage image : accommodation.getImages()) {
+            s3Service.deleteFile(image.getImgKey());
+        }
 
         accommodationRepository.delete(accommodation);
-
+        return true;
     }
 }

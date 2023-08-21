@@ -52,13 +52,11 @@ public class AccommodationController {
     }
 
     @DeleteMapping("/api/accommodation/{accommodationId}")
-    public ResponseEntity<Accommodation> deleteAccommodation(@PathVariable Long accommodationId) {
+    public ResponseEntity<String> deleteAccommodation(@PathVariable Long accommodationId) {
+        if (accommodationService.deleteAccommodation(accommodationId))
+            return new ResponseEntity<>("숙소가 성공적으로 삭제되었습니다.", HttpStatus.OK);
+        else
+            return new ResponseEntity<>("숙소를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
-        try{
-            accommodationService.deleteAccommodation(accommodationId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 }
