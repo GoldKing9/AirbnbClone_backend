@@ -1,5 +1,6 @@
 package dbDive.airbnbClone.entity.accommodation;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,9 +18,11 @@ public class AcmdImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acmd_id")
+    @JsonBackReference
     private Accommodation accommodation;
 
-    public AcmdImage(String imageUrl) {
+    public AcmdImage(String imageUrl, String imgKey) {
         this.imageUrl = imageUrl;
+        this.imgKey = imgKey;
     }
 }
