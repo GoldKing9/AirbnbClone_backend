@@ -7,6 +7,7 @@ import dbDive.airbnbClone.entity.user.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,12 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
-     private final Key key;
-    public JwtUtils(@Value("${jwt.secretKey}") String secretKey) {
+    @Value("${jwt.secretKey}")
+    private String secretKey;
+     private Key key;
+
+    @PostConstruct
+    public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
