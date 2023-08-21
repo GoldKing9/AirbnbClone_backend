@@ -5,6 +5,7 @@ import dbDive.airbnbClone.api.review.dto.response.ReviewModifyResponse;
 import dbDive.airbnbClone.api.review.dto.response.ReviewResponse;
 import dbDive.airbnbClone.api.review.service.ReviewService;
 import dbDive.airbnbClone.config.auth.AuthUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class ReviewController {
     @PostMapping("/api/auth/user/accommodation/review/{accommodationId}")
     public void postReview(@PathVariable Long accommodationId,
                            @AuthenticationPrincipal AuthUser authUser,
-                           @RequestBody ReviewRequest request){
+                           @Valid @RequestBody ReviewRequest request){
         reviewService.post(accommodationId, authUser.getUser().getId(), request);
     }
 
