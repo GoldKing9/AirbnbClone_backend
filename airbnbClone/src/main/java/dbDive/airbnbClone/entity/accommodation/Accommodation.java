@@ -86,4 +86,8 @@ public class Accommodation extends BaseTimeEntity {
         this.images.remove(image);
         image.setAccommodation(null);
     }
+
+    public void clearImage() {
+        this.images.clear();
+    }
 }

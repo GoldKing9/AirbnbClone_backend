@@ -66,28 +66,38 @@ public class AccommodationService {
         accommodation.updateAccommodationDetails(dto.getBed(), dto.getBedroom(), dto.getBathroom(),
                 dto.getGuest(), dto.getAcmdName(), dto.getAcmdDescription(), dto.getPrice());
 
+        List<AcmdImage> uploadImage = new ArrayList<>();
         if (newImages != null && !newImages.isEmpty()) {
             for (MultipartFile newImageFile : newImages) {
                 String newImgKey = s3Service.uploadFile(newImageFile);
                 String newImageUrl = amazonS3.getUrl(bucketName, newImgKey).toExternalForm();
                 AcmdImage newAcmdImage = new AcmdImage(newImageUrl, newImgKey);
-                accommodation.addImage(newAcmdImage);
+                uploadImage.add(newAcmdImage);
             }
         }
 
-        if (dto.getDeleteImageKey() != null && !dto.getDeleteImageKey().isEmpty()) {
-            for (String deleteKey : dto.getDeleteImageKey()) {
-                AcmdImage imageToDelete = accommodation.getImages().stream()
-                        .filter(img -> img.getImgKey().equals(deleteKey))
-                        .findFirst()
-                        .orElse(null);
-
-                if (imageToDelete != null) {
-                    accommodation.removeImage(imageToDelete);
-                    s3Service.deleteFile(deleteKey);
-                }
-            }
+        for (AcmdImage oldImage : accommodation.getImages()) {
+            s3Service.deleteFile(oldImage.getImgKey());
         }
+        accommodation.clearImage();
+
+        for (AcmdImage newImage : uploadImage) {
+            accommodation.addImage(newImage);
+        }
+
+//        if (dto.getDeleteImageKey() != null && !dto.getDeleteImageKey().isEmpty()) {
+//            for (String deleteKey : dto.getDeleteImageKey()) {
+//                AcmdImage imageToDelete = accommodation.getImages().stream()
+//                        .filter(img -> img.getImgKey().equals(deleteKey))
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                if (imageToDelete != null) {
+//                    accommodation.removeImage(imageToDelete);
+//                    s3Service.deleteFile(deleteKey);
+//                }
+//            }
+//        }
 
 
         return accommodationRepository.save(accommodation);
