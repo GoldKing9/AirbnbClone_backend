@@ -7,15 +7,20 @@ import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditDto;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
+import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.accommodation.AcmdImage;
+import dbDive.airbnbClone.entity.user.User;
+import dbDive.airbnbClone.entity.user.UserRole;
 import dbDive.airbnbClone.repository.accommodation.AccommodationRepository;
+import dbDive.airbnbClone.repository.accommodation.AcmdImageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -26,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
+    private final AcmdImageRepository acmdImageRepository;
     private final S3Service s3Service;
     private final AmazonS3 amazonS3;
 
@@ -41,10 +47,15 @@ public class AccommodationService {
         return accommodationRepository.findAccommodation(accommodationId);
     }
 
-    public Accommodation saveAccommodation(AccommodationDto dto,
-                                           List<MultipartFile> images) {
-        // 빌더패턴, 정적 팩토리 메서드
-        Accommodation accommodation = new Accommodation(dto.getMainAddress(),  dto.getPrice(), dto.getDetailAddress(), dto.getAcmdName(), dto.getAcmdDescription(), dto.getGuest(), dto.getBedroom(), dto.getBed(), dto.getBathroom());
+    public void saveAccommodation(AccommodationDto dto,
+                                           List<MultipartFile> images,
+                                           User user) {
+
+        Accommodation accommodation = new Accommodation(dto.getMainAddress(),  dto.getPrice(),
+                                                        dto.getDetailAddress(), dto.getAcmdName(),
+                                                        dto.getAcmdDescription(), dto.getGuest(),
+                                                        dto.getBedroom(), dto.getBed(),
+                                                        dto.getBathroom(), user);
         List<AcmdImage> imageEntities = new ArrayList<>();
 
         for (MultipartFile imageFile : images) {
@@ -54,18 +65,26 @@ public class AccommodationService {
             accommodation.addImage(acmdImage);
         }
 
-        return accommodationRepository.save(accommodation);
+        accommodationRepository.save(accommodation);
     }
 
-    public Accommodation editAccommodation(Long accommodationId,
+    @Transactional
+    public void editAccommodation(Long accommodationId,
                                            AccommodationEditDto dto,
-                                           List<MultipartFile> newImages) {
+                                           List<MultipartFile> newImages,
+                                           User user) {
 
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 숙소가 없습니다 Id : " + accommodationId));
 
-        accommodation.updateAccommodationDetails(dto.getBed(), dto.getBedroom(), dto.getBathroom(),
-                dto.getGuest(), dto.getAcmdName(), dto.getAcmdDescription(), dto.getPrice());
+        if (!accommodation.getUser().getId().equals(user.getId())) {
+            throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
+        }
+
+        accommodation.updateAccommodationDetails(dto.getBed(), dto.getBedroom(),
+                                                    dto.getBathroom(), dto.getGuest(),
+                                                    dto.getAcmdName(), dto.getAcmdDescription(),
+                                                    dto.getPrice(), user);
 
         List<AcmdImage> uploadImage = new ArrayList<>();
         if (newImages != null && !newImages.isEmpty()) {
@@ -76,44 +95,32 @@ public class AccommodationService {
                 uploadImage.add(newAcmdImage);
             }
         }
-
         for (AcmdImage oldImage : accommodation.getImages()) {
             s3Service.deleteFile(oldImage.getImgKey());
         }
-        accommodation.clearImage();
+        acmdImageRepository.deleteAllInBatch(accommodation.getImages());
 
         for (AcmdImage newImage : uploadImage) {
             accommodation.addImage(newImage);
         }
-//        if (dto.getDeleteImageKey() != null && !dto.getDeleteImageKey().isEmpty()) {
-//            for (String deleteKey : dto.getDeleteImageKey()) {
-//                AcmdImage imageToDelete = accommodation.getImages().stream()
-//                        .filter(img -> img.getImgKey().equals(deleteKey))
-//                        .findFirst()
-//                        .orElse(null);
-//
-//                if (imageToDelete != null) {
-//                    accommodation.removeImage(imageToDelete);
-//                    s3Service.deleteFile(deleteKey);
-//                }
-//            }
-//        }
 
-        return accommodationRepository.save(accommodation);
+        accommodationRepository.save(accommodation);
     }
-    public boolean deleteAccommodation(Long accommodationId) {
-        Optional<Accommodation> accommodationOpt = accommodationRepository.findById(accommodationId);
+    public void deleteAccommodation(Long accommodationId,
+                                       User user) {
 
-        if (accommodationOpt.isEmpty()) {
-            return false;
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 숙소가 없습니다 Id : " + accommodationId));
+
+
+        if (!accommodation.getUser().getId().equals(user.getId())) {
+            throw new GlobalException("이 숙소를 삭제할 권한이 없습니다.");
         }
-        Accommodation accommodation = accommodationOpt.get();
 
         for (AcmdImage image : accommodation.getImages()) {
             s3Service.deleteFile(image.getImgKey());
         }
 
         accommodationRepository.delete(accommodation);
-        return true;
     }
 }

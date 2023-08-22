@@ -38,9 +38,11 @@ public class ReservationController {
         return reservationService.selectAccommodations(reservationId,authUser);
     }
 
-    @DeleteMapping("/accommodation/{reservationId}") // 게스트 예약 취소
-    public void deleteAccommodation(@PathVariable Long reservationId, @AuthenticationPrincipal AuthUser authUser) {
-        reservationService.deleteAccommodation(reservationId,authUser);
+
+    @DeleteMapping("/accommodation/reservation/{reservationId}")
+    public void deleteAccommodation(@PathVariable Long reservationId) {
+        reservationService.deleteAccommodation(reservationId);
+
     }
 
 

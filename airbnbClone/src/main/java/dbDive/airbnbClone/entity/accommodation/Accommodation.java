@@ -41,7 +41,7 @@ public class Accommodation extends BaseTimeEntity {
     @JsonManagedReference
     private List<AcmdImage> images = new ArrayList<>();
 
-    public void updateAccommodationDetails(int bed, int bedroom, int bathroom, int guest, String acmdName, String acmdDescription, int price) {
+    public void updateAccommodationDetails(int bed, int bedroom, int bathroom, int guest, String acmdName, String acmdDescription, int price, User user) {
         this.bed = bed;
         this.bedroom = bedroom;
         this.bathroom = bathroom;
@@ -49,6 +49,7 @@ public class Accommodation extends BaseTimeEntity {
         this.acmdName = acmdName;
         this.acmdDescription = acmdDescription;
         this.price = price;
+        this.user = user;
     }
 
     @Builder
@@ -66,7 +67,7 @@ public class Accommodation extends BaseTimeEntity {
         this.user = user;
     }
 
-    public Accommodation(String mainAddress, int price, String detailAddress, String acmdName, String acmdDescription, int guest, int bedroom, int bed, int bathroom) {
+    public Accommodation(String mainAddress, int price, String detailAddress, String acmdName, String acmdDescription, int guest, int bedroom, int bed, int bathroom, User user) {
         this.mainAddress = mainAddress;
         this.price = price;
         this.detailAddress = detailAddress;
@@ -76,6 +77,7 @@ public class Accommodation extends BaseTimeEntity {
         this.bedroom = bedroom;
         this.bed = bed;
         this.bathroom = bathroom;
+        this.user = user;
     }
 
     public void addImage(AcmdImage image) {
@@ -85,9 +87,5 @@ public class Accommodation extends BaseTimeEntity {
     public void removeImage(AcmdImage image) {
         this.images.remove(image);
         image.setAccommodation(null);
-    }
-
-    public void clearImage() {
-        this.images.clear();
     }
 }
