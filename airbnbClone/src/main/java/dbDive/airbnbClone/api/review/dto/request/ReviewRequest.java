@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class ReviewRequest {
 
-    @Size(max = 255, message = "255자를 초과할 수 없습니다.")
+    @Size(max = 1000, message = "1000자를 초과할 수 없습니다.")
     private String comment;
     @Min(value = 1, message = "1미만은 안됩니다.") @Max(value = 5, message = "5를 초과할 수 없습니다.")
     private int rating;

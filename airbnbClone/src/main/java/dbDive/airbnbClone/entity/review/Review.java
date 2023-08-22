@@ -23,6 +23,7 @@ public class Review extends BaseTimeEntity {
 
     private int rating;
     private boolean isDeleted;
+    @Lob
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
