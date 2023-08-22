@@ -32,19 +32,21 @@ public class ReviewService {
         Accommodation acmd = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new GlobalException("존재하지 않는 게시물입니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("존재하지 않는 회원입니다."));
+
         Review review = Review.builder()
                 .accommodation(acmd)
                 .user(user)
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .build();
+
         reviewRepository.save(review);
     }
     @Transactional
     public ReviewModifyResponse modify(Long reviewId, Long userId, ReviewRequest request) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new GlobalException("존재하지 않는 리뷰입니다."));
-        if(review.getUser().getId() != userId){
-            throw new GlobalException("잘못된 접근입니다.");
+        if(!review.getUser().getId().equals(userId)){
+            throw new GlobalException("수정 권한이 없습니다.");
         }
 
         review.update(request.getComment());
@@ -54,7 +56,7 @@ public class ReviewService {
 
     public void delete(Long reviewId, Long userId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new GlobalException("존재하지 않는 리뷰입니다."));
-        if(review.getUser().getId() != userId){
+        if(!review.getUser().getId().equals(userId)){
             throw new GlobalException("잘못된 접근입니다.");
         }
         reviewRepository.deleteById(reviewId);

@@ -11,10 +11,7 @@ import dbDive.airbnbClone.api.review.dto.response.ReviewComment;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileAcmd;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.api.user.dto.response.UserReviews;
-import dbDive.airbnbClone.entity.accommodation.AcmdImage;
-import dbDive.airbnbClone.entity.accommodation.QAccommodation;
 import dbDive.airbnbClone.entity.user.QUser;
-import dbDive.airbnbClone.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -128,6 +125,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .join(review.user, reviewUser)
                 .where(review.accommodation.eq(accommodation)
                         .and(accommodation.user.id.eq(userId)))
+                .orderBy(review.id.desc())
                 .limit(6)
                 .fetch();
         
@@ -158,6 +156,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 ))
                 .from(accommodation)
                 .where(accommodation.user.id.eq(userId))
+                .orderBy(accommodation.id.desc())
                 .limit(10)
                 .fetch();
 

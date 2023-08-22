@@ -73,10 +73,12 @@ public class UserService {
     }
 
     @Transactional
-    public void modifyUserProfile(Long userId, ModifyUserProfileRequest request) {
-        // TODO : 로그인 유저 ID와 userID 같은지 검증
-
+    public void modifyUserProfile(Long userId, AuthUser authUser, ModifyUserProfileRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("존재하지 않는 회원입니다."));
+        if(!user.getId().equals(authUser.getUser().getId())){
+            throw new GlobalException("접근 권한이 없습니다.");
+        }
+
         user.update(request.getUserDescription());
     }
 
