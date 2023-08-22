@@ -49,6 +49,5 @@ public class AccommodationController {
     public void deleteAccommodation(@PathVariable Long accommodationId,
                                     @AuthenticationPrincipal AuthUser authUser) {
         accommodationService.deleteAccommodation(accommodationId, authUser.getUser());
-
     }
 }
