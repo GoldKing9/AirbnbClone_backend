@@ -74,7 +74,7 @@ public class AccommodationService {
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 숙소가 없습니다 Id : " + accommodationId));
 
-        if (!user.getRole().equals(UserRole.ADMIN) && !accommodation.getUser().getId().equals(user.getId())) {
+        if (!accommodation.getUser().getId().equals(user.getId())) {
             throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
         }
 
@@ -111,7 +111,7 @@ public class AccommodationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 숙소가 없습니다 Id : " + accommodationId));
 
 
-        if (user.getRole().equals(UserRole.ADMIN) && !accommodation.getUser().getId().equals(user.getId())) {
+        if (!accommodation.getUser().getId().equals(user.getId())) {
             throw new GlobalException("이 숙소를 삭제할 권한이 없습니다.");
         }
 
