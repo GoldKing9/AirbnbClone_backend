@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import dbDive.airbnbClone.api.reservation.dto.HostReservationDto;
 import dbDive.airbnbClone.api.reservation.dto.ReservationDto;
 import dbDive.airbnbClone.api.reservation.dto.SelectReservationDto;
+import dbDive.airbnbClone.config.auth.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +27,11 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PageImpl<ReservationDto> findAllReservations(Pageable pageable) {
+    public PageImpl<ReservationDto> findAllReservations(Pageable pageable, AuthUser authUser) {
         List<ReservationDto> reservations = queryFactory
                 .select(Projections.constructor(ReservationDto.class,
                         accommodation.id,
-                        user.id,
+                        reservation.user.id,
                         accommodation.mainAddress,
                         user.username,
                         reservation.checkIn,
@@ -38,7 +39,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                 .from(accommodation)
                 .join(reservation).on(reservation.accommodation.id.eq(accommodation.id))
                 .join(user).on(accommodation.user.id.eq(user.id))
-                .where(reservation.isDeleted.eq(false))
+                .where(reservation.isDeleted.eq(false),reservation.user.id.eq(authUser.getUser().getId()))
                 .orderBy(reservation.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -63,15 +64,17 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                 r.setImages(acmdImages.getOrDefault(r.getAccommodationId(), new ArrayList<>()))
         );
 
-        Long count = queryFactory.select(accommodation.count())
-                .from(accommodation)
+        Long count = queryFactory.select(reservation.count())
+                .from(reservation)
+                .join(user).on(user.id.eq(reservation.user.id))
+                .where(user.id.eq(authUser.getUser().getId()))
                 .fetchOne();
 
         return new PageImpl<ReservationDto>(reservations, pageable, count);
     }
 
     @Override
-    public SelectReservationDto findSelectReservation(Long reservationId) {
+    public SelectReservationDto findSelectReservation(Long reservationId, AuthUser authUser) {
         SelectReservationDto selectReservationDto = queryFactory
                 .select(Projections.constructor(SelectReservationDto.class,
                         accommodation.id,
@@ -84,7 +87,9 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                 .from(reservation)
                 .join(user).on(user.id.eq(reservation.user.id))
                 .join(accommodation).on(accommodation.id.eq(reservation.accommodation.id))
-                .where(reservation.id.eq(reservationId), (reservation.isDeleted.eq(false)))
+                .where(reservation.id.eq(reservationId)
+                        ,(reservation.isDeleted.eq(false))
+                        ,reservation.user.id.eq(authUser.getUser().getId()))
                 .orderBy(reservation.createdAt.desc())
                 .fetchOne();
         Long accommodationId = selectReservationDto.getAccommodationId();
@@ -101,7 +106,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public PageImpl<HostReservationDto> findHostReservation(Long userId, Pageable pageable) {
+    public PageImpl<HostReservationDto> findHostReservation(Pageable pageable,AuthUser authUser) {
         /**
          * 1. 등록된 accommodation에서 userId로 accommodationId 찾기
          * 2. accommodationId 으로 같은 accommodationId 을 가지고 있는 acmd_image, reservation 찾기
@@ -127,10 +132,10 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                                 .otherwise("예약 취소"),
                         reservation.totalPrice))
                 .from(reservation)
-                .join(user).on(user.id.eq(reservation.user.id))
-                .join(accommodation).on(accommodation.id.eq(reservation.accommodation.id))
-                .join(acmdImage).on(acmdImage.accommodation.id.eq(accommodation.id))
-                .where(accommodation.user.id.eq(userId))
+                .leftJoin(user).on(user.id.eq(reservation.user.id))
+                .leftJoin(accommodation).on(accommodation.id.eq(reservation.accommodation.id))
+                .leftJoin(acmdImage).on(acmdImage.accommodation.id.eq(accommodation.id))
+                .where(accommodation.user.id.eq(authUser.getUser().getId()))
                 .groupBy(reservation.id)
                 .orderBy(reservation.createdAt.asc())
                 .offset(pageable.getOffset())
@@ -140,7 +145,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
         Long count = queryFactory.select(reservation.count())
                 .from(reservation)
                 .join(accommodation).on(reservation.accommodation.id.eq(accommodation.id))
-                .where(accommodation.user.id.eq(userId))
+                .where(accommodation.user.id.eq(authUser.getUser().getId()))
                 .fetchOne();
 
         return new PageImpl<HostReservationDto>(hostReservationDto, pageable, count);
