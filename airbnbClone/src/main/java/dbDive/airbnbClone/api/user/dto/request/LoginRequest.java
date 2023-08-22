@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class LoginReq {
+public class LoginRequest {
     @Email
     private String email;
     @Pattern(regexp = "^[a-z0-9]{4,14}$")

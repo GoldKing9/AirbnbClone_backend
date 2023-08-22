@@ -1,19 +1,21 @@
 package dbDive.airbnbClone.api.user.controller;
 
-import dbDive.airbnbClone.api.user.dto.request.LoginReq;
+import dbDive.airbnbClone.api.user.dto.request.LoginRequest;
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
-import dbDive.airbnbClone.api.user.dto.request.SignupReq;
+import dbDive.airbnbClone.api.user.dto.request.SignupRequest;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
+import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
+import dbDive.airbnbClone.api.user.service.UserService;
 import dbDive.airbnbClone.config.auth.AuthUser;
+import dbDive.airbnbClone.config.utils.JwtProperties;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import dbDive.airbnbClone.api.user.dto.response.UserReviewResponse;
-import dbDive.airbnbClone.api.user.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
+import static dbDive.airbnbClone.config.utils.JwtProperties.HEADER_STRING;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,42 +24,38 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/api/user/signup")
-    public void signup(@Validated @RequestBody SignupReq signupReq) {
-        userService.signup(signupReq);
+    public void signup(@Validated @RequestBody SignupRequest signupRequest) {
+        userService.signup(signupRequest);
     }
 
     @PostMapping("/api/user/login")
-    public void login(@Validated @RequestBody LoginReq loginReq, HttpServletResponse response) {
-
-        response.setHeader("Authorization", userService.login(loginReq));
+    public void login(@Validated @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        response.setHeader(HEADER_STRING, userService.login(loginRequest));
     }
 
     @PostMapping("/api/auth/user/logout")
     public void logout(@AuthenticationPrincipal AuthUser authUser) {
-        
+
     }
 
     @GetMapping("/api/user/{userId}/review")
     public UserReviewResponse userReview(
             @PathVariable Long userId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ){
-        Pageable pageable = PageRequest.of(page-1, size);
-
+            Pageable pageable
+    ) {
         return userService.getUserReviews(userId, pageable);
     }
 
-    @PutMapping("/api/auth/user/{userId}")
-    public void modifyUserProfile(@PathVariable Long userId,
-                                  @AuthenticationPrincipal AuthUser authUser,
-                                  @RequestBody ModifyUserProfileRequest request){
+    @PutMapping("/api/auth/user")
+    public void modifyUserProfile(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody ModifyUserProfileRequest request) {
 
-        userService.modifyUserProfile(userId, authUser, request);
+        userService.modifyUserProfile(authUser.getUser(), request);
     }
 
     @GetMapping("/api/user/{userId}")
-    public UserProfileResponse userProfile(@PathVariable Long userId){
+    public UserProfileResponse userProfile(@PathVariable Long userId) {
         return userService.getUserProfile(userId);
     }
 }

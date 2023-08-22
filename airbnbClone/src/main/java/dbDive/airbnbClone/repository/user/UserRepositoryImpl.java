@@ -19,7 +19,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static dbDive.airbnbClone.entity.accommodation.QAccommodation.accommodation;
-import static dbDive.airbnbClone.entity.accommodation.QAcmdImage.*;
+import static dbDive.airbnbClone.entity.accommodation.QAcmdImage.acmdImage;
 import static dbDive.airbnbClone.entity.review.QReview.review;
 import static dbDive.airbnbClone.entity.user.QUser.user;
 

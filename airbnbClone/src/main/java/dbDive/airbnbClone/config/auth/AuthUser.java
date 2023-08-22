@@ -9,7 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@AllArgsConstructor @Getter
+@Getter
+@AllArgsConstructor
 public class AuthUser implements UserDetails {
     private User user;
 

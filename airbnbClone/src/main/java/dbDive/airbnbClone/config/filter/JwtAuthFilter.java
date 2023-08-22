@@ -2,6 +2,8 @@ package dbDive.airbnbClone.config.filter;
 
 import dbDive.airbnbClone.config.auth.AuthUser;
 import dbDive.airbnbClone.config.utils.JwtUtils;
+import dbDive.airbnbClone.entity.accommodation.Accommodation;
+import dbDive.airbnbClone.entity.user.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

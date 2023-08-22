@@ -1,8 +1,6 @@
 package dbDive.airbnbClone.api.review.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package dbDive.airbnbClone.api.user.service;
 
-import dbDive.airbnbClone.api.user.dto.request.LoginReq;
+import dbDive.airbnbClone.api.user.dto.request.LoginRequest;
 import dbDive.airbnbClone.api.user.dto.request.ModifyUserProfileRequest;
-import dbDive.airbnbClone.api.user.dto.request.SignupReq;
+import dbDive.airbnbClone.api.user.dto.request.SignupRequest;
 import dbDive.airbnbClone.api.user.dto.response.UserProfileResponse;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.config.auth.AuthUser;
@@ -24,8 +24,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static dbDive.airbnbClone.config.utils.JwtProperties.TOKEN_PREFIX;
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -33,17 +36,18 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
-    public void signup(SignupReq signupReq) {
+    @Transactional
+    public void signup(SignupRequest signupRequest) {
 
-        userRepository.findByEmail(signupReq.getEmail())
+        userRepository.findByEmail(signupRequest.getEmail())
                 .ifPresent(user -> {throw new GlobalException("중복된 유저가 존재합니다.");});
 
         User newUser = User.builder()
-                .email(signupReq.getEmail())
-                .password(passwordEncoder.encode(signupReq.getPassword()))
+                .email(signupRequest.getEmail())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .role(UserRole.USER)
-                .username(signupReq.getUsername())
-                .birth(signupReq.getBirth())
+                .username(signupRequest.getUsername())
+                .birth(signupRequest.getBirth())
                 .userDescription("")
                 .build();
 
@@ -51,18 +55,17 @@ public class UserService {
 
     }
 
-    public String login(LoginReq loginReq) {
+    @Transactional
+    public String login(LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         AuthUser authUser = (AuthUser) authentication.getPrincipal();
 
-        String jwt = JwtProperties.TOKEN_PREFIX + jwtUtils.generateJwt(authUser);
-
-        return jwt;
+        return TOKEN_PREFIX + jwtUtils.generateJwt(authUser);
 
     }
 
@@ -73,11 +76,7 @@ public class UserService {
     }
 
     @Transactional
-    public void modifyUserProfile(Long userId, AuthUser authUser, ModifyUserProfileRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("존재하지 않는 회원입니다."));
-        if(!user.getId().equals(authUser.getUser().getId())){
-            throw new GlobalException("접근 권한이 없습니다.");
-        }
+    public void modifyUserProfile(User user, ModifyUserProfileRequest request) {
 
         user.update(request.getUserDescription());
     }

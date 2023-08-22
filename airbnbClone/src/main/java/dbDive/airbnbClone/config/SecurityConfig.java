@@ -1,5 +1,6 @@
-package dbDive.airbnbClone.config.auth;
+package dbDive.airbnbClone.config;
 
+import dbDive.airbnbClone.config.auth.AuthService;
 import dbDive.airbnbClone.config.filter.CustomAuthenticationEntryPoint;
 import dbDive.airbnbClone.config.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;

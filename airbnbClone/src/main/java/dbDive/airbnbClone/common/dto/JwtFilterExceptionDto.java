@@ -1,4 +1,4 @@
-package dbDive.airbnbClone.config.filter;
+package dbDive.airbnbClone.common.dto;
 
 import lombok.Getter;
 

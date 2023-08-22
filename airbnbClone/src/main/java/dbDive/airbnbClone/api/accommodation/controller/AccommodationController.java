@@ -1,17 +1,14 @@
 package dbDive.airbnbClone.api.accommodation.controller;
 
-import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationDto;
-import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditDto;
+import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationReqeust;
+import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditRequest;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
 import dbDive.airbnbClone.api.accommodation.service.AccommodationService;
 import dbDive.airbnbClone.config.auth.AuthUser;
-import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,25 +29,25 @@ public class AccommodationController {
     public DetailAcmdResponse detail(@PathVariable Long accommodationId) {
         return accommodationService.detail(accommodationId);
     }
-    @PostMapping("/api/auth/accommodation")
-    public void registerAccommodation(@RequestPart AccommodationDto dto,
-                                                               @RequestPart List<MultipartFile> images,
-                                                               @AuthenticationPrincipal AuthUser authUser) {
 
+    @PostMapping("/api/auth/accommodation")
+    public void registerAccommodation(@RequestPart AccommodationReqeust dto,
+                                      @RequestPart List<MultipartFile> images,
+                                      @AuthenticationPrincipal AuthUser authUser) {
         accommodationService.saveAccommodation(dto, images, authUser.getUser());
     }
+
     @PutMapping("/api/auth/accommodation/{accommodationId}")
     public void editAccommodation(@PathVariable Long accommodationId,
-                                                           @RequestPart(value = "dto") AccommodationEditDto dto,
-                                                           @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
-                                                           @AuthenticationPrincipal AuthUser authUser)
-    {
+                                  @RequestPart(value = "dto") AccommodationEditRequest dto,
+                                  @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
+                                  @AuthenticationPrincipal AuthUser authUser) {
         accommodationService.editAccommodation(accommodationId, dto, newImages, authUser.getUser());
     }
 
     @DeleteMapping("/api/auth/accommodation/{accommodationId}")
     public void deleteAccommodation(@PathVariable Long accommodationId,
-                                                      @AuthenticationPrincipal AuthUser authUser) {
+                                    @AuthenticationPrincipal AuthUser authUser) {
         accommodationService.deleteAccommodation(accommodationId, authUser.getUser());
 
     }

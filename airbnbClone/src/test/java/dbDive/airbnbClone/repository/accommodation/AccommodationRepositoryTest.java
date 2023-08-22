@@ -1,8 +1,7 @@
 package dbDive.airbnbClone.repository.accommodation;
 
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
+import dbDive.airbnbClone.api.accommodation.dto.response.AccommodationDataDto;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.resevation.Reservation;
@@ -17,10 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import static dbDive.airbnbClone.entity.accommodation.QAccommodation.accommodation;
-import static dbDive.airbnbClone.entity.resevation.QReservation.reservation;
 
 @SpringBootTest
 class AccommodationRepositoryTest {

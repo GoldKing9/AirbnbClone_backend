@@ -2,6 +2,7 @@ package dbDive.airbnbClone.api.review.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+
 @Getter
 public class ReviewComment {
     private Long userId;

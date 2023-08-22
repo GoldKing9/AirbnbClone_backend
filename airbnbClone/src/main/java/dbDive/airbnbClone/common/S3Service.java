@@ -1,4 +1,4 @@
-package dbDive.airbnbClone.api.accommodation.service;
+package dbDive.airbnbClone.common;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+// 위치
 @Service
 @RequiredArgsConstructor
 public class S3Service {
@@ -31,6 +32,7 @@ public class S3Service {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
     }
+
     public void deleteFile(String fileKey) {
         try {
             amazonS3.deleteObject(bucketName, fileKey);

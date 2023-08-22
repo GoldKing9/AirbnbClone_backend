@@ -1,18 +1,18 @@
 package dbDive.airbnbClone.api.accommodation.dto.request;
 
-
 import lombok.Getter;
-import lombok.ToString;
+
+import java.util.List;
 
 @Getter
-public class AccommodationDto {
-    private String mainAddress;
-    private String detailAddress;
+public class AccommodationEditRequest {
     private int guest;
     private int bedroom;
     private int bed;
     private int bathroom;
+    private List<String> deleteImageKey;
     private String acmdName;
     private String acmdDescription;
     private int price;
+
 }

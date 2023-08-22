@@ -1,6 +1,5 @@
 package dbDive.airbnbClone.repository.review;
 
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -13,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.querydsl.core.types.ExpressionUtils.count;
-import static dbDive.airbnbClone.entity.accommodation.QAccommodation.accommodation;
 import static dbDive.airbnbClone.entity.review.QReview.review;
 import static dbDive.airbnbClone.entity.user.QUser.user;
 

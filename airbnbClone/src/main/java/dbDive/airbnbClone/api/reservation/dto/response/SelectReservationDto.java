@@ -1,6 +1,5 @@
-package dbDive.airbnbClone.api.reservation.dto;
+package dbDive.airbnbClone.api.reservation.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

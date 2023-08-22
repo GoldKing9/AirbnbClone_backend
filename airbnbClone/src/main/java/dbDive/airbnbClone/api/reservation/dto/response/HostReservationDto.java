@@ -1,10 +1,9 @@
-package dbDive.airbnbClone.api.reservation.dto;
+package dbDive.airbnbClone.api.reservation.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -19,8 +18,6 @@ public class HostReservationDto {
     private String images;
     private String status;
     private int totalPrice;
-
-
 
     public HostReservationDto(Long reservationId,Long userId, String username, LocalDate checkIn, LocalDate checkOut, Long accommodationId, String acmdName, String images, String status, int totalPrice) {
         this.reservationId = reservationId;

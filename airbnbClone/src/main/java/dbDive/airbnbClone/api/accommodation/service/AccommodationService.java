@@ -1,17 +1,17 @@
 package dbDive.airbnbClone.api.accommodation.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
-import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationDto;
-import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditDto;
+import dbDive.airbnbClone.api.accommodation.dto.response.AccommodationDataDto;
+import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationReqeust;
+import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditRequest;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
 import dbDive.airbnbClone.common.GlobalException;
+import dbDive.airbnbClone.common.S3Service;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
 import dbDive.airbnbClone.entity.accommodation.AcmdImage;
 import dbDive.airbnbClone.entity.user.User;
-import dbDive.airbnbClone.entity.user.UserRole;
 import dbDive.airbnbClone.repository.accommodation.AccommodationRepository;
 import dbDive.airbnbClone.repository.accommodation.AcmdImageRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,10 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final AcmdImageRepository acmdImageRepository;
@@ -47,16 +47,23 @@ public class AccommodationService {
         return accommodationRepository.findAccommodation(accommodationId);
     }
 
-    public void saveAccommodation(AccommodationDto dto,
-                                           List<MultipartFile> images,
-                                           User user) {
+    @Transactional
+    public void saveAccommodation(AccommodationReqeust dto,
+                                  List<MultipartFile> images,
+                                  User user) {
 
-        Accommodation accommodation = new Accommodation(dto.getMainAddress(),  dto.getPrice(),
-                                                        dto.getDetailAddress(), dto.getAcmdName(),
-                                                        dto.getAcmdDescription(), dto.getGuest(),
-                                                        dto.getBedroom(), dto.getBed(),
-                                                        dto.getBathroom(), user);
-        List<AcmdImage> imageEntities = new ArrayList<>();
+        Accommodation accommodation = Accommodation.builder()
+                .mainAddress(dto.getMainAddress())
+                .price(dto.getPrice())
+                .detailAddress(dto.getDetailAddress())
+                .acmdName(dto.getAcmdName())
+                .acmdDescription(dto.getAcmdDescription())
+                .guest(dto.getGuest())
+                .bed(dto.getBed())
+                .bedroom(dto.getBedroom())
+                .bathroom(dto.getBathroom())
+                .user(user)
+                .build();
 
         for (MultipartFile imageFile : images) {
             String imgKey = s3Service.uploadFile(imageFile);
@@ -70,7 +77,7 @@ public class AccommodationService {
 
     @Transactional
     public void editAccommodation(Long accommodationId,
-                                           AccommodationEditDto dto,
+                                           AccommodationEditRequest dto,
                                            List<MultipartFile> newImages,
                                            User user) {
 
@@ -106,6 +113,8 @@ public class AccommodationService {
 
         accommodationRepository.save(accommodation);
     }
+
+    @Transactional
     public void deleteAccommodation(Long accommodationId,
                                        User user) {
 

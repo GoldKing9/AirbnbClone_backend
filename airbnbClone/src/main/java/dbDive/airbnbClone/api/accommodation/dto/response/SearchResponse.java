@@ -1,6 +1,5 @@
 package dbDive.airbnbClone.api.accommodation.dto.response;
 
-import dbDive.airbnbClone.api.accommodation.dto.AccommodationDataDto;
 import lombok.Getter;
 import org.springframework.data.domain.PageImpl;
 

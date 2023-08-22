@@ -1,6 +1,7 @@
 package dbDive.airbnbClone.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dbDive.airbnbClone.common.dto.JwtFilterExceptionDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

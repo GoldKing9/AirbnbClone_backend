@@ -1,4 +1,4 @@
-package dbDive.airbnbClone.api.accommodation.dto;
+package dbDive.airbnbClone.api.accommodation.dto.response;
 
 public record ImageDto(
         String acmdImageUrl

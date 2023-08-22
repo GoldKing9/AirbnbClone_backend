@@ -18,7 +18,6 @@ public class AuthService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User findUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GlobalException("존재하지 않는 유저입니다."));
-
         return new AuthUser(findUser);
     }
 }
