@@ -49,8 +49,11 @@ public class UserController {
     }
 
     @PutMapping("/api/auth/user/{userId}")
-    public void modifyUserProfile(@PathVariable Long userId, @RequestBody ModifyUserProfileRequest request){
-        userService.modifyUserProfile(userId, request);
+    public void modifyUserProfile(@PathVariable Long userId,
+                                  @AuthenticationPrincipal AuthUser authUser,
+                                  @RequestBody ModifyUserProfileRequest request){
+
+        userService.modifyUserProfile(userId, authUser, request);
     }
 
     @GetMapping("/api/user/{userId}")
