@@ -31,18 +31,18 @@ public class AccommodationController {
     }
 
     @PostMapping("/api/auth/accommodation")
-    public void registerAccommodation(@RequestPart AccommodationReqeust dto,
+    public void registerAccommodation(@RequestPart AccommodationReqeust request,
                                       @RequestPart List<MultipartFile> images,
                                       @AuthenticationPrincipal AuthUser authUser) {
-        accommodationService.saveAccommodation(dto, images, authUser.getUser());
+        accommodationService.saveAccommodation(request, images, authUser.getUser());
     }
 
     @PutMapping("/api/auth/accommodation/{accommodationId}")
     public void editAccommodation(@PathVariable Long accommodationId,
-                                  @RequestPart(value = "dto") AccommodationEditRequest dto,
+                                  @RequestPart(value = "request") AccommodationEditRequest request,
                                   @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
                                   @AuthenticationPrincipal AuthUser authUser) {
-        accommodationService.editAccommodation(accommodationId, dto, newImages, authUser.getUser());
+        accommodationService.editAccommodation(accommodationId, request, newImages, authUser.getUser());
     }
 
     @DeleteMapping("/api/auth/accommodation/{accommodationId}")

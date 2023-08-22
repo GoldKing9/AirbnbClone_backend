@@ -48,20 +48,20 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void saveAccommodation(AccommodationReqeust dto,
+    public void saveAccommodation(AccommodationReqeust request,
                                   List<MultipartFile> images,
                                   User user) {
 
         Accommodation accommodation = Accommodation.builder()
-                .mainAddress(dto.getMainAddress())
-                .price(dto.getPrice())
-                .detailAddress(dto.getDetailAddress())
-                .acmdName(dto.getAcmdName())
-                .acmdDescription(dto.getAcmdDescription())
-                .guest(dto.getGuest())
-                .bed(dto.getBed())
-                .bedroom(dto.getBedroom())
-                .bathroom(dto.getBathroom())
+                .mainAddress(request.getMainAddress())
+                .price(request.getPrice())
+                .detailAddress(request.getDetailAddress())
+                .acmdName(request.getAcmdName())
+                .acmdDescription(request.getAcmdDescription())
+                .guest(request.getGuest())
+                .bed(request.getBed())
+                .bedroom(request.getBedroom())
+                .bathroom(request.getBathroom())
                 .user(user)
                 .build();
 
@@ -77,7 +77,7 @@ public class AccommodationService {
 
     @Transactional
     public void editAccommodation(Long accommodationId,
-                                           AccommodationEditRequest dto,
+                                           AccommodationEditRequest request,
                                            List<MultipartFile> newImages,
                                            User user) {
 
@@ -88,10 +88,10 @@ public class AccommodationService {
             throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
         }
 
-        accommodation.updateAccommodationDetails(dto.getBed(), dto.getBedroom(),
-                                                    dto.getBathroom(), dto.getGuest(),
-                                                    dto.getAcmdName(), dto.getAcmdDescription(),
-                                                    dto.getPrice(), user);
+        accommodation.updateAccommodationDetails(request.getBed(), request.getBedroom(),
+                                                    request.getBathroom(), request.getGuest(),
+                                                    request.getAcmdName(), request.getAcmdDescription(),
+                                                    request.getPrice(), user);
 
         List<AcmdImage> uploadImage = new ArrayList<>();
         if (newImages != null && !newImages.isEmpty()) {
