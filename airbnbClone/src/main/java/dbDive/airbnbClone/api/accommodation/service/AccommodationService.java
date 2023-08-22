@@ -13,6 +13,7 @@ import dbDive.airbnbClone.entity.accommodation.AcmdImage;
 import dbDive.airbnbClone.entity.user.User;
 import dbDive.airbnbClone.entity.user.UserRole;
 import dbDive.airbnbClone.repository.accommodation.AccommodationRepository;
+import dbDive.airbnbClone.repository.accommodation.AcmdImageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
+    private final AcmdImageRepository acmdImageRepository;
     private final S3Service s3Service;
     private final AmazonS3 amazonS3;
 
@@ -45,7 +47,7 @@ public class AccommodationService {
         return accommodationRepository.findAccommodation(accommodationId);
     }
 
-    public Accommodation saveAccommodation(AccommodationDto dto,
+    public void saveAccommodation(AccommodationDto dto,
                                            List<MultipartFile> images,
                                            User user) {
 
@@ -62,11 +64,12 @@ public class AccommodationService {
             AcmdImage acmdImage = new AcmdImage(imageUrl, imgKey);
             accommodation.addImage(acmdImage);
         }
-        return accommodationRepository.save(accommodation);
+
+        accommodationRepository.save(accommodation);
     }
 
     @Transactional
-    public Accommodation editAccommodation(Long accommodationId,
+    public void editAccommodation(Long accommodationId,
                                            AccommodationEditDto dto,
                                            List<MultipartFile> newImages,
                                            User user) {
@@ -77,7 +80,6 @@ public class AccommodationService {
         if (!accommodation.getUser().getId().equals(user.getId())) {
             throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
         }
-
 
         accommodation.updateAccommodationDetails(dto.getBed(), dto.getBedroom(),
                                                     dto.getBathroom(), dto.getGuest(),
@@ -96,15 +98,15 @@ public class AccommodationService {
         for (AcmdImage oldImage : accommodation.getImages()) {
             s3Service.deleteFile(oldImage.getImgKey());
         }
-        accommodation.clearImage();
+        acmdImageRepository.deleteAllInBatch(accommodation.getImages());
 
         for (AcmdImage newImage : uploadImage) {
             accommodation.addImage(newImage);
         }
 
-        return accommodationRepository.save(accommodation);
+        accommodationRepository.save(accommodation);
     }
-    public boolean deleteAccommodation(Long accommodationId,
+    public void deleteAccommodation(Long accommodationId,
                                        User user) {
 
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -120,6 +122,5 @@ public class AccommodationService {
         }
 
         accommodationRepository.delete(accommodation);
-        return true;
     }
 }

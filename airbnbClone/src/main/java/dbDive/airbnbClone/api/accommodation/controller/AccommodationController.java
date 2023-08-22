@@ -33,35 +33,25 @@ public class AccommodationController {
         return accommodationService.detail(accommodationId);
     }
     @PostMapping("/api/auth/accommodation")
-    public ResponseEntity<Accommodation> registerAccommodation(@RequestPart AccommodationDto dto,
+    public void registerAccommodation(@RequestPart AccommodationDto dto,
                                                                @RequestPart List<MultipartFile> images,
                                                                @AuthenticationPrincipal AuthUser authUser) {
 
-        Accommodation savedAccommodation = accommodationService.saveAccommodation(dto, images, authUser.getUser());
-
-        return new ResponseEntity<>(savedAccommodation, HttpStatus.CREATED);
+        accommodationService.saveAccommodation(dto, images, authUser.getUser());
     }
     @PutMapping("/api/auth/accommodation/{accommodationId}")
-    public ResponseEntity<Accommodation> editAccommodation(@PathVariable Long accommodationId,
+    public void editAccommodation(@PathVariable Long accommodationId,
                                                            @RequestPart(value = "dto") AccommodationEditDto dto,
                                                            @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
                                                            @AuthenticationPrincipal AuthUser authUser)
     {
-        Accommodation updatedAccommodation = accommodationService.editAccommodation(accommodationId, dto, newImages, authUser.getUser());
-
-        if (updatedAccommodation != null)
-            return new ResponseEntity<>(updatedAccommodation, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        accommodationService.editAccommodation(accommodationId, dto, newImages, authUser.getUser());
     }
 
     @DeleteMapping("/api/auth/accommodation/{accommodationId}")
-    public ResponseEntity<String> deleteAccommodation(@PathVariable Long accommodationId,
+    public void deleteAccommodation(@PathVariable Long accommodationId,
                                                       @AuthenticationPrincipal AuthUser authUser) {
-        if (accommodationService.deleteAccommodation(accommodationId, authUser.getUser()))
-            return new ResponseEntity<>("숙소가 성공적으로 삭제되었습니다.", HttpStatus.OK);
-        else
-            return new ResponseEntity<>("숙소를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        accommodationService.deleteAccommodation(accommodationId, authUser.getUser());
 
     }
 }
