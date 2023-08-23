@@ -1,11 +1,7 @@
 package dbDive.airbnbClone.api.reservation.service;
 
-import dbDive.airbnbClone.api.reservation.dto.response.HostReservationDto;
-import dbDive.airbnbClone.api.reservation.dto.response.ReservationDto;
-import dbDive.airbnbClone.api.reservation.dto.response.SelectReservationDto;
 import dbDive.airbnbClone.api.reservation.dto.request.BookRequest;
-import dbDive.airbnbClone.api.reservation.dto.response.HostTotalAccommodationResponse;
-import dbDive.airbnbClone.api.reservation.dto.response.TotalAccommodationResponse;
+import dbDive.airbnbClone.api.reservation.dto.response.*;
 import dbDive.airbnbClone.common.GlobalException;
 import dbDive.airbnbClone.config.auth.AuthUser;
 import dbDive.airbnbClone.entity.accommodation.Accommodation;
@@ -31,15 +27,22 @@ public class ReservationService {
     public void bookAccommodation(Long accommodationId, BookRequest request, AuthUser authUser) {
 
         Accommodation findAcmd = accommodationRepository.findById(accommodationId).orElseThrow(() -> new GlobalException("존재하지 않는 숙소입니다,"));
-        Reservation reservation = Reservation.builder()
-                .checkIn(request.getCheckIn())
-                .checkOut(request.getCheckOut())
-                .totalPrice(request.getTotalPrice())
-                .guest(request.getGuest())
-                .user(authUser.getUser())
-                .accommodation(findAcmd)
-                .build();
-        reservationRepository.save(reservation);
+        int guest = request.getGuest();
+        int accommodationGuest = findAcmd.getGuest();
+
+        if (guest > accommodationGuest) {
+            throw new GlobalException("숙소 인원을 초과했습니다.");
+        } else {
+            Reservation reservation = Reservation.builder()
+                    .checkIn(request.getCheckIn())
+                    .checkOut(request.getCheckOut())
+                    .totalPrice(request.getTotalPrice())
+                    .guest(request.getGuest())
+                    .user(authUser.getUser())
+                    .accommodation(findAcmd)
+                    .build();
+            reservationRepository.save(reservation);
+        }
     }
 
     public TotalAccommodationResponse getAllReservation(Pageable pageable, AuthUser authUser) {
