@@ -52,6 +52,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*"); // 모든 header에 응답 허용
         config.addAllowedMethod("*"); //모든 method 요청을 허용
+        config.addExposedHeader("*");
         source.registerCorsConfiguration("/api/**", config);
         return new CorsFilter(source);
     }
