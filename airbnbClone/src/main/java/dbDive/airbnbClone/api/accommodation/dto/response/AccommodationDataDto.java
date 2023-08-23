@@ -12,13 +12,6 @@ public class AccommodationDataDto {
         private String mainAddress;
         private int price;
         private double ratingAvg;
-        private String detailAddress;
-        private String acmdName;
-        private String acmdDescription;
-        private int guest;
-        private int bedroom;
-        private int bed;
-        private int bathroom;
         private List<ImageDto> images;
 
     public AccommodationDataDto(Long accommodationId, String mainAddress, int price, double ratingAvg) {

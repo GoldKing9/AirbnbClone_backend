@@ -1,7 +1,7 @@
 package dbDive.airbnbClone.api.accommodation.controller;
 
-import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationReqeust;
 import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationEditRequest;
+import dbDive.airbnbClone.api.accommodation.dto.request.AccommodationReqeust;
 import dbDive.airbnbClone.api.accommodation.dto.request.SearchRequest;
 import dbDive.airbnbClone.api.accommodation.dto.response.DetailAcmdResponse;
 import dbDive.airbnbClone.api.accommodation.dto.response.SearchResponse;
@@ -21,7 +21,7 @@ public class AccommodationController {
     private final AccommodationService accommodationService;
 
     @GetMapping("/api/accommodation/search")
-    public SearchResponse search(Pageable pageable, @ModelAttribute SearchRequest request) {
+    public SearchResponse search(Pageable pageable,@ModelAttribute SearchRequest request) {
         return accommodationService.search(pageable, request);
     }
 
