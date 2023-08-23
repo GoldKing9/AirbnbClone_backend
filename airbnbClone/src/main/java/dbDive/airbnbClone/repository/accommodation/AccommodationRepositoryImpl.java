@@ -88,9 +88,19 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
         fillAccommodationImages(accommodations);
 
         Long count = jpaQueryFactory.select(
-                        accommodation.count()
+                        accommodation.countDistinct()
                 )
                 .from(accommodation)
+                .leftJoin(review).on(accommodation.eq(review.accommodation))
+                .where(
+                        containMainAddress(request.mainAddress()),
+                        periodDate(request.checkIn(), request.checkout()),
+                        betweenPrice(request.minPrice(), request.maxPrice()),
+                        goeGuest(request.guest()),
+                        goeBathroom(request.bathroom()),
+                        goeBedroom(request.bedroom()),
+                        goeBed(request.bed())
+                )
                 .fetchOne();
 
         return new PageImpl<>(accommodations, pageable, count);
@@ -118,27 +128,27 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
     }
 
     private BooleanExpression betweenPrice(Integer minPrice, Integer maxPrice) {
-        BooleanExpression isMinPrice = accommodation.price.goe(minPrice);
-        BooleanExpression isMaxPrice = accommodation.price.loe(maxPrice);
+        BooleanExpression isMinPrice = isEmpty(minPrice) ? null : accommodation.price.goe(minPrice);
+        BooleanExpression isMaxPrice = isEmpty(maxPrice) ? null : accommodation.price.loe(maxPrice);
         return Expressions.allOf(isMinPrice, isMaxPrice);
 
     }
 
-    private BooleanExpression goeBed(int bed) {
+    private BooleanExpression goeBed(Integer bed) {
         return isEmpty(bed) ? null : accommodation.bed.goe(bed);
     }
 
-    private BooleanExpression goeBedroom(int bedroom) {
+    private BooleanExpression goeBedroom(Integer bedroom) {
 
         return isEmpty(bedroom) ? null : accommodation.bedroom.goe(bedroom);
     }
 
-    private BooleanExpression goeBathroom(int bathroom) {
+    private BooleanExpression goeBathroom(Integer bathroom) {
 
         return isEmpty(bathroom) ? null : accommodation.bathroom.goe(bathroom);
     }
 
-    private BooleanExpression goeGuest(int guest) {
+    private BooleanExpression goeGuest(Integer guest) {
         return isEmpty(guest) ? null : accommodation.guest.goe(guest);
     }
 

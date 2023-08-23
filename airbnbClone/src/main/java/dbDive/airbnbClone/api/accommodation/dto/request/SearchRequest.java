@@ -10,11 +10,11 @@ public record SearchRequest(
         LocalDate checkIn,
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate checkout,
-        int minPrice,
-        int maxPrice,
-        int guest,
-        int bathroom,
-        int bedroom,
-        int bed
+        Integer minPrice,
+        Integer maxPrice,
+        Integer guest,
+        Integer bathroom,
+        Integer bedroom,
+        Integer bed
 ) {
 }
