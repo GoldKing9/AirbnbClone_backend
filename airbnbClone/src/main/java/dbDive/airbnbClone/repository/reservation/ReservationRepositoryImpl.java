@@ -35,11 +35,16 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                         accommodation.mainAddress,
                         user.username,
                         reservation.checkIn,
-                        reservation.checkOut))
+                        reservation.checkOut,
+                        new CaseBuilder()
+                                .when(reservation.checkOut.after(LocalDate.now()).and(reservation.isDeleted.eq(false))).then("예약 중")
+                                .when(reservation.checkOut.before(LocalDate.now()).and(reservation.isDeleted.eq(false))).then("이용완료")
+                                .otherwise("예약 취소"))
+                )
                 .from(accommodation)
                 .join(reservation).on(reservation.accommodation.id.eq(accommodation.id))
                 .join(user).on(accommodation.user.id.eq(user.id))
-                .where(reservation.isDeleted.eq(false),reservation.user.id.eq(authUser.getUser().getId()))
+                .where(reservation.user.id.eq(authUser.getUser().getId()))
                 .orderBy(reservation.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -83,13 +88,16 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
                         user.id,
                         user.username,
                         user.userDescription,
+                        new CaseBuilder()
+                                .when(reservation.checkOut.after(LocalDate.now()).and(reservation.isDeleted.eq(false))).then("예약 중")
+                                .when(reservation.checkOut.before(LocalDate.now()).and(reservation.isDeleted.eq(false))).then("이용완료")
+                                .otherwise("예약 취소"),
                         reservation.totalPrice))
                 .from(reservation)
                 .join(user).on(user.id.eq(reservation.user.id))
                 .join(accommodation).on(accommodation.id.eq(reservation.accommodation.id))
                 .where(reservation.id.eq(reservationId)
-                        ,(reservation.isDeleted.eq(false))
-                        ,reservation.user.id.eq(authUser.getUser().getId()))
+                        , reservation.user.id.eq(authUser.getUser().getId()))
                 .orderBy(reservation.createdAt.desc())
                 .fetchOne();
         Long accommodationId = selectReservationDto.getAccommodationId();
@@ -106,7 +114,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public PageImpl<HostReservationDto> findHostReservation(Pageable pageable,AuthUser authUser) {
+    public PageImpl<HostReservationDto> findHostReservation(Pageable pageable, AuthUser authUser) {
         /**
          * 1. 등록된 accommodation에서 userId로 accommodationId 찾기
          * 2. accommodationId 으로 같은 accommodationId 을 가지고 있는 acmd_image, reservation 찾기
