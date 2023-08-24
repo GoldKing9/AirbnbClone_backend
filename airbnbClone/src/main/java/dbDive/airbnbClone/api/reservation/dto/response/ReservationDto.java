@@ -15,14 +15,16 @@ public class ReservationDto {
     private String username;
     private LocalDate checkIn;
     private LocalDate checkOut;
+    private String status;
     private List<String> images;
 
-    public ReservationDto(Long accommodationId,Long userId, String city, String username, LocalDate checkIn, LocalDate checkOut) {
+    public ReservationDto(Long accommodationId,Long userId, String city, String username, LocalDate checkIn, LocalDate checkOut, String status ) {
         this.accommodationId = accommodationId;
         this.userId = userId;
         this.city = city;
         this.username = username;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
+        this.status = status;
     }
 }
