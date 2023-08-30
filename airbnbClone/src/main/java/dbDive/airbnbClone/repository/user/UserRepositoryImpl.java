@@ -24,7 +24,7 @@ import static dbDive.airbnbClone.entity.review.QReview.review;
 import static dbDive.airbnbClone.entity.user.QUser.user;
 
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepositoryCustom{
+public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -128,7 +128,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .orderBy(review.id.desc())
                 .limit(6)
                 .fetch();
-        
+
         response.setReviews(reviews);
 
         JPQLQuery<String> url = JPAExpressions
