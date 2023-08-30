@@ -20,14 +20,15 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public String uploadFile(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, Long accommodationId) {
+        String originalFileName = file.getOriginalFilename();
+        String uniqueFileName = accommodationId + "_" + originalFileName;
 
         try {
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), new ObjectMetadata())
+            amazonS3.putObject(new PutObjectRequest(bucketName, uniqueFileName, file.getInputStream(), new ObjectMetadata())
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
-            return fileName;
+            return uniqueFileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
