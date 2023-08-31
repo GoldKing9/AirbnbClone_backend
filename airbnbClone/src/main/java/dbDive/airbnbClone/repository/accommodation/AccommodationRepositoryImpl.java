@@ -51,7 +51,8 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
                 .where(accommodation.id.eq(accommodationId))
                 .fetchOne();
         List<ImageDto> images = jpaQueryFactory.select(Projections.constructor(ImageDto.class,
-                        acmdImage.imageUrl
+                        acmdImage.imageUrl,
+                        acmdImage.imgKey
                 ))
                 .from(accommodation)
                 .leftJoin(acmdImage).on(accommodation.eq(acmdImage.accommodation))

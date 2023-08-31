@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserProfileAcmd {
-    private Long accmmodationId;
+    private Long accommodationId;
     private String acmdImageUrl;
     private String acmdRatingAvg;
     private String mainAddress;
 
-    public UserProfileAcmd(Long accmmodationId, String acmdImageUrl, double acmdRatingAvg, String mainAddress) {
-        this.accmmodationId = accmmodationId;
+    public UserProfileAcmd(Long accommodationId, String acmdImageUrl, double acmdRatingAvg, String mainAddress) {
+        this.accommodationId = accommodationId;
         this.acmdImageUrl = acmdImageUrl;
         this.acmdRatingAvg = String.format("%.2f", acmdRatingAvg);
         this.mainAddress = mainAddress;

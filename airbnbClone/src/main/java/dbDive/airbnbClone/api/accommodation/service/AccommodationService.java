@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,10 +49,12 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void saveAccommodation(AccommodationReqeust request,
-                                  List<MultipartFile> images,
-                                  User user) {
+    public void saveAccommodation(AccommodationReqeust request, List<MultipartFile> images, User user) {
+        Accommodation accommodation = createAndSaveAccommodation(request, user);
+        saveImagesToAccommodation(images, accommodation);
+    }
 
+    private Accommodation createAndSaveAccommodation(AccommodationReqeust request, User user) {
         Accommodation accommodation = Accommodation.builder()
                 .mainAddress(request.getMainAddress())
                 .price(request.getPrice())
@@ -64,21 +67,24 @@ public class AccommodationService {
                 .bathroom(request.getBathroom())
                 .user(user)
                 .build();
+        accommodationRepository.save(accommodation);
+        return accommodation;
+    }
 
+    private void saveImagesToAccommodation(List<MultipartFile> images, Accommodation accommodation) {
         for (MultipartFile imageFile : images) {
             String imgKey = s3Service.uploadFile(imageFile);
             String imageUrl = amazonS3.getUrl(bucketName, imgKey).toExternalForm();
             AcmdImage acmdImage = new AcmdImage(imageUrl, imgKey);
             accommodation.addImage(acmdImage);
         }
-
         accommodationRepository.save(accommodation);
     }
 
     @Transactional
     public void editAccommodation(Long accommodationId,
                                            AccommodationEditRequest request,
-                                           List<MultipartFile> newImages,
+                                           List<MultipartFile> images,
                                            User user) {
 
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -88,27 +94,23 @@ public class AccommodationService {
             throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
         }
 
-        accommodation.updateAccommodationDetails(request.getBed(), request.getBedroom(),
-                                                    request.getBathroom(), request.getGuest(),
-                                                    request.getAcmdName(), request.getAcmdDescription(),
-                                                    request.getPrice(), user);
-
-        List<AcmdImage> uploadImage = new ArrayList<>();
-        if (newImages != null && !newImages.isEmpty()) {
-            for (MultipartFile newImageFile : newImages) {
-                String newImgKey = s3Service.uploadFile(newImageFile);
-                String newImageUrl = amazonS3.getUrl(bucketName, newImgKey).toExternalForm();
-                AcmdImage newAcmdImage = new AcmdImage(newImageUrl, newImgKey);
-                uploadImage.add(newAcmdImage);
-            }
-        }
         for (AcmdImage oldImage : accommodation.getImages()) {
             s3Service.deleteFile(oldImage.getImgKey());
         }
         acmdImageRepository.deleteAllInBatch(accommodation.getImages());
 
-        for (AcmdImage newImage : uploadImage) {
-            accommodation.addImage(newImage);
+        List<AcmdImage> uploadImage = new ArrayList<>();
+
+            for (MultipartFile imageFile : images) {
+                String imgKey = s3Service.uploadFile(imageFile);
+                String imageUrl = amazonS3.getUrl(bucketName, imgKey).toExternalForm();
+                AcmdImage AcmdImage = new AcmdImage(imageUrl, imgKey);
+                uploadImage.add(AcmdImage);
+            }
+
+
+        for (AcmdImage image : uploadImage) {
+            accommodation.addImage(image);
         }
 
         accommodationRepository.save(accommodation);

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 // 위치
 @Service
@@ -21,13 +22,14 @@ public class S3Service {
     private String bucketName;
 
     public String uploadFile(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename();
+        String uniqueFileName = getUuidFileName(originalFileName);
 
         try {
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), new ObjectMetadata())
+            amazonS3.putObject(new PutObjectRequest(bucketName, uniqueFileName, file.getInputStream(), new ObjectMetadata())
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
-            return fileName;
+            return uniqueFileName;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
@@ -39,5 +41,9 @@ public class S3Service {
         } catch (AmazonServiceException e) {
             throw new RuntimeException("Failed to delete file from S3", e);
         }
+    }
+    public String getUuidFileName(String fileName) {
+        String ext = fileName.substring(fileName.indexOf(".") + 1);
+        return UUID.randomUUID().toString() + "." + ext;
     }
 }
