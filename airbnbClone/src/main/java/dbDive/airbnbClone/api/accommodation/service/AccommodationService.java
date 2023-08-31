@@ -73,7 +73,7 @@ public class AccommodationService {
 
     private void saveImagesToAccommodation(List<MultipartFile> images, Accommodation accommodation) {
         for (MultipartFile imageFile : images) {
-            String imgKey = s3Service.uploadFile(imageFile, accommodation.getId());
+            String imgKey = s3Service.uploadFile(imageFile);
             String imageUrl = amazonS3.getUrl(bucketName, imgKey).toExternalForm();
             AcmdImage acmdImage = new AcmdImage(imageUrl, imgKey);
             accommodation.addImage(acmdImage);
@@ -84,7 +84,7 @@ public class AccommodationService {
     @Transactional
     public void editAccommodation(Long accommodationId,
                                            AccommodationEditRequest request,
-                                           List<MultipartFile> newImages,
+                                           List<MultipartFile> images,
                                            User user) {
 
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -94,42 +94,25 @@ public class AccommodationService {
             throw new GlobalException("이 숙소를 편집할 권한이 없습니다.");
         }
 
-        accommodation.updateAccommodationDetails(request.getBed(), request.getBedroom(),
-                request.getBathroom(), request.getGuest(),
-                request.getAcmdName(), request.getAcmdDescription(),
-                request.getPrice(), user);
+        for (AcmdImage oldImage : accommodation.getImages()) {
+            s3Service.deleteFile(oldImage.getImgKey());
+        }
+        acmdImageRepository.deleteAllInBatch(accommodation.getImages());
 
-        List<String> deleteImageKey = request.getDeleteImageKey();
-        if (deleteImageKey != null) {
-            List<AcmdImage> imagesToDelete = accommodation.getImages().stream()
-                    .filter(img -> deleteImageKey.contains(img.getImgKey()))
-                    .toList();
+        List<AcmdImage> uploadImage = new ArrayList<>();
 
-            List<AcmdImage> deletedFromS3 = new ArrayList<>();
-
-            for (AcmdImage imageToDelete : imagesToDelete) {
-                try {
-                    s3Service.deleteFile(imageToDelete.getImgKey());
-                    deletedFromS3.add(imageToDelete);
-                } catch (Exception e) {
-                    throw new GlobalException("s3에서 이미지 삭제에 실패했습니다: " + imageToDelete.getImgKey());
-                }
+            for (MultipartFile imageFile : images) {
+                String imgKey = s3Service.uploadFile(imageFile);
+                String imageUrl = amazonS3.getUrl(bucketName, imgKey).toExternalForm();
+                AcmdImage AcmdImage = new AcmdImage(imageUrl, imgKey);
+                uploadImage.add(AcmdImage);
             }
-            if (deletedFromS3.size() != imagesToDelete.size()) {
-                throw new GlobalException("모든 이미지가 s3에서 삭제되지 않았습니다.");
-            }
-                imagesToDelete.forEach(accommodation.getImages()::remove);
-                acmdImageRepository.deleteAll(imagesToDelete);
+
+
+        for (AcmdImage image : uploadImage) {
+            accommodation.addImage(image);
         }
 
-        if (newImages != null && !newImages.isEmpty()) {
-            for (MultipartFile newImageFile : newImages) {
-                String newImgKey = s3Service.uploadFile(newImageFile, accommodationId);
-                String newImageUrl = amazonS3.getUrl(bucketName, newImgKey).toExternalForm();
-                AcmdImage newAcmdImage = new AcmdImage(newImageUrl, newImgKey);
-                accommodation.addImage(newAcmdImage);
-            }
-        }
         accommodationRepository.save(accommodation);
     }
 

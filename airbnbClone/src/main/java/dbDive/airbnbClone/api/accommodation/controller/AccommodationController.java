@@ -40,9 +40,9 @@ public class AccommodationController {
     @PutMapping("/api/auth/accommodation/{accommodationId}")
     public void editAccommodation(@PathVariable Long accommodationId,
                                   @RequestPart(value = "request") AccommodationEditRequest request,
-                                  @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
+                                  @RequestPart() List<MultipartFile> images,
                                   @AuthenticationPrincipal AuthUser authUser) {
-        accommodationService.editAccommodation(accommodationId, request, newImages, authUser.getUser());
+        accommodationService.editAccommodation(accommodationId, request, images, authUser.getUser());
     }
 
     @DeleteMapping("/api/auth/accommodation/{accommodationId}")
